@@ -5,6 +5,8 @@ import SignUpPage from '../pages/auth/signup/page';
 import SocialSignUpPage from '../pages/auth/social-signup/page';
 import { TermsOfServicePage } from '../pages/auth/terms-of-service/page';
 import { PrivacyPolicyPage } from '../pages/auth/privacy-policy/page';
+import { InterestSelectionPage } from '../pages/auth/interest-selection/page';
+import { TermsAgreementPage } from '../pages/auth/terms-agreement/page';
 
 export const router = createBrowserRouter([
   {
@@ -30,5 +32,13 @@ export const router = createBrowserRouter([
   {
     path: '/auth/privacy-policy',
     element: <PrivacyPolicyPage />,
+  },
+  {
+    path: '/auth/interest-selection',
+    element: <InterestSelectionPage />,
+  },
+  {
+    path: '/auth/terms-agreement',
+    element: <TermsAgreementPage />,
   },
 ]);

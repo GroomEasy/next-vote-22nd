@@ -23,6 +23,18 @@ const HomePage = () => {
       >
         소셜 회원가입 페이지
       </button>
+      <button
+        onClick={() => navigate('/auth/interest-selection')}
+        className="px-6 py-3 bg-gray-400 text-white"
+      >
+        관심 분야 선택 페이지
+      </button>
+      <button
+        onClick={() => navigate('/auth/terms-agreement')}
+        className="px-6 py-3 bg-gray-300 text-white"
+      >
+        약관 동의 페이지
+      </button>
     </div>
   );
 };

@@ -4,6 +4,9 @@ import backIcon from '../../images/login/back.svg';
 import googleIcon from '../../images/login/google.svg';
 import kakaoIcon from '../../images/login/kakao.svg';
 import separateIcon from '../../images/login/seperate.svg';
+import { authService } from '../../services/auth.service';
+import type { ApiErrorResponse } from '../../lib/api/types';
+import { AxiosError } from 'axios';
 
 type UserType = 'login' | 'expert';
 
@@ -14,15 +17,56 @@ export function LoginForm() {
     email: '',
     password: '',
   });
+  const [error, setError] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // 입력 시 에러 메시지 초기화
+    if (error) setError('');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('로그인:', { ...formData, userType });
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const response = await authService.login({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      // 로그인 성공
+      if (response.statusCode === 0) {
+        console.log('로그인 성공:', response.data);
+        // 홈 페이지로 이동
+        navigate('/');
+      }
+    } catch (err) {
+      // 에러 처리
+      const axiosError = err as AxiosError<ApiErrorResponse>;
+      if (axiosError.response) {
+        const { statusCode, message } = axiosError.response.data;
+
+        // API 명세서 에러 코드 처리
+        switch (statusCode) {
+          case 1101:
+            setError('이메일이 일치하지 않습니다.');
+            break;
+          case 1102:
+            setError('비밀번호가 일치하지 않습니다.');
+            break;
+          default:
+            setError(message || '로그인에 실패했습니다. 다시 시도해주세요.');
+        }
+      } else {
+        setError('네트워크 오류가 발생했습니다. 다시 시도해주세요.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -73,6 +117,7 @@ export function LoginForm() {
             onChange={handleChange}
             className="w-full h-12 px-5 border border-gray-200 rounded focus:outline-none focus:border-gray-300 placeholder:text-gray-400 text-[13px] bg-white transition-colors"
             required
+            disabled={isLoading}
           />
 
           {/* Password Input */}
@@ -84,14 +129,23 @@ export function LoginForm() {
             onChange={handleChange}
             className="w-full h-12 px-5 border border-gray-200 rounded focus:outline-none focus:border-gray-300 placeholder:text-gray-400 text-[13px] bg-white transition-colors"
             required
+            disabled={isLoading}
           />
+
+          {/* Error Message */}
+          {error && (
+            <div className="text-red-500 text-sm px-1">
+              {error}
+            </div>
+          )}
 
           {/* Login Button */}
           <button
             type="submit"
-            className="w-full h-14 flex items-center justify-center mt-2 font-semibold text-base bg-black text-white hover:bg-gray-800 transition-colors rounded"
+            disabled={isLoading}
+            className="w-full h-14 flex items-center justify-center mt-2 font-semibold text-base bg-black text-white hover:bg-gray-800 transition-colors rounded disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            로그인
+            {isLoading ? '로그인 중...' : '로그인'}
           </button>
 
           {/* Password Reset / Sign Up Links */}

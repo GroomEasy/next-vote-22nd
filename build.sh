@@ -1,5 +1,5 @@
 #!/bin/sh
-cd ../
-rm -rf output
-mkdir output
-cp -R ./next-vote-22nd/* ./output
+# GitHub Actions workspace is already in the repo root
+rm -rf ../output
+mkdir -p ../output
+cp -R ./* ../output/
